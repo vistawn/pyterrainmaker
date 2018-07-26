@@ -196,7 +196,7 @@ class TerrainBundle(object):
 
     def write_tiles(self, location):
         self.calculate_tiles()
-        terrain_level_loc = location + '/' + str(self.level)
+        terrain_level_loc = os.path.join(location, str(self.level))
         if os.path.isdir(terrain_level_loc) is False:
             os.mkdir(terrain_level_loc)
 

@@ -50,7 +50,7 @@ class TerrainTile(object):
             encoded_bytes = self.encode(in_buddle_array, decodetype)
         if encoded_bytes is not None:
             # save
-            terrain_x_loc = location + '/' + str(self.x)
+            terrain_x_loc = os.path.join(location, str(self.x))
             if os.path.isdir(terrain_x_loc) is False:
                 os.mkdir(terrain_x_loc)
             terrain_file_name = terrain_x_loc + '/' + str(self.y) + '.terrain'
