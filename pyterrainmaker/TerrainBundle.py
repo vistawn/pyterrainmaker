@@ -2,14 +2,13 @@
 #
 # TerrainBundle Class
 # multiple terrain tiles as processing unit.
-# default is 256 * 256
+# default is 128 * 128
 #
 
 import os
 import numpy as np
 from osgeo import gdalconst
-from osgeo import gdal, ogr, osr
-from osgeo import gdal_array
+from osgeo import gdal
 
 from GlobalGeodetic import GlobalGeodetic
 from TerrainTile import TerrainTile
@@ -86,8 +85,10 @@ class TerrainBundle(object):
                     tile = TerrainTile(offset_x=index_x * 64, offset_y=index_y*64, flag_child=flag)
                     tile.x = tile_x
                     tile.y = tile_y
+
                     if self.level < 6:
                         tile.fake = True
+
                     self.__tiles.append(tile)
 
         if self.level < 6:
@@ -98,9 +99,9 @@ class TerrainBundle(object):
         bundle_px_width = bundle_tiles_x * 64 + 1
         bundle_px_height = bundle_tiles_y * 64 + 1
 
-        #first_range
+        # first range
         (f_min_y, f_min_x, f_max_y, f_max_x) = gg.TileLatLonBounds(self.from_tile[0], self.from_tile[1], self.level)
-        #bundle_range
+        # bundle_range
         (b_min_y, b_min_x, b_max_y, b_max_x) = (
             f_min_y - (f_max_y - f_min_y) * (bundle_tiles_y - 1),
             f_min_x,
@@ -144,10 +145,8 @@ class TerrainBundle(object):
         (m_rows, m_cols) = tile_array.shape
 
         mem_drv = gdal.GetDriverByName('MEM')
-        # tif_drv = gdal.GetDriverByName('GTiff')
 
         dst_bundle_ds = mem_drv.Create('', bundle_px_width, bundle_px_height, 1, gdalconst.GDT_Float32)
-        # dst_bundle_ds = tif_drv.Create('tmp/tif/' + str(self.level) + '_' + str(self.from_tile[0]) + '_' + str(self.from_tile[1]) + '.tif', bundle_px_width, bundle_px_height, 1, gdalconst.GDT_Float32)
 
         if m_cols == bundle_px_width and m_rows == bundle_px_height:
             dst_bundle_ds.WriteRaster(0, 0, m_cols, m_rows, np.frombuffer(tile_array).tostring())
@@ -170,7 +169,6 @@ class TerrainBundle(object):
         del prj_ds
         del dst_bundle_ds
 
-
     def calc_tile_flag(self, (t_min_y, t_min_x, t_max_y, t_max_x)):
         N = S = W = E = False
         mid_x = (t_min_x + t_max_x) / 2
@@ -187,7 +185,6 @@ class TerrainBundle(object):
 
         return make_child_flags(N, S, E, W)
 
-
     def is_in_source_range(self, min_x, min_y, max_x, max_y):
         s_min_x, s_min_y, s_max_x, s_max_y = self.source_range
         if min_x > s_max_x or max_x < s_min_x or min_y > s_max_y or max_y < s_min_y:
@@ -202,10 +199,8 @@ class TerrainBundle(object):
         terrain_level_loc = location + '/' + str(self.level)
         if os.path.isdir(terrain_level_loc) is False:
             os.mkdir(terrain_level_loc)
-        # for tile in self.__tiles:
-        #     tile.encode_and_save(self.bundle_array, terrain_level_loc)
-        #     tile = None
-        while(len(self.__tiles)>0):
+
+        while len(self.__tiles) > 0:
             tile = self.__tiles.pop(0)
             tile.encode_and_save(self.bundle_array, terrain_level_loc)
             del tile
