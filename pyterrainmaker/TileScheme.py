@@ -110,7 +110,7 @@ class TileScheme(object):
                 g_bundle.resolution = res
                 g_bundle.from_tile = (left_tx, top_ty)
                 g_bundle.no_data = self.source_no_data
-                g_bundle.replace_no_data = self.repalce_no_data
+                g_bundle.out_no_data = self.out_no_data
                 g_bundle.has_next_level = has_child
                 g_bundle.data_band = source_band
                 g_bundle.source_range = (self.__minx, self.__miny, self.__maxx, self.__maxy)

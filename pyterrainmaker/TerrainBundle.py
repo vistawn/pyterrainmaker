@@ -54,7 +54,7 @@ class TerrainBundle(object):
         self.data_band = None
         self.is_compact = False
         self.no_data = None
-        self.replace_no_data = None
+        self.out_no_data = None
         self.bundle_array = None
 
     def calculate_tiles(self):
@@ -133,9 +133,9 @@ class TerrainBundle(object):
         tile_array = self.data_band.ReadAsArray(b_px_min_x, b_px_min_y, w_x, w_y)
 
         fill_blank_value = self.no_data
-        if self.replace_no_data is not None:
-            fill_blank_value = self.replace_no_data
-            np.place(tile_array, tile_array == self.no_data, self.replace_no_data)
+        if self.out_no_data is not None:
+            fill_blank_value = self.out_no_data
+            np.place(tile_array, tile_array == self.no_data, self.out_no_data)
 
         shift_obj = (shift_obj_v, shift_obj_h) = ((shift_top, shift_bottom), (shift_left, shift_right))
 
