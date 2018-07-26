@@ -6,13 +6,14 @@
 #
 
 from __future__ import print_function
+import os
+import sys
 from osgeo import gdal
 import multiprocessing
 
 import GlobalGeodetic
 from TerrainBundle import TerrainBundle
 
-import sys
 if sys.version_info >= (3, 0):
     xrange = range
 
@@ -24,6 +25,7 @@ class TileScheme(object):
         create tiling scheme
         :param input_tif: input GeoTiff file
         """
+
         self.bundles = []
         self.__ds = gdal.Open(input_tif)
         if self.__ds is None:
@@ -89,6 +91,17 @@ class TileScheme(object):
             find_band_index += 1
         return self.__source_bands[find_band_index]
 
+    def __write_config(self, loc):
+        with open(os.path.join(loc, 'layer.json'), 'w') as f:
+            f.write(
+                """{
+                  "tilejson": "2.1.0",
+                  "format": "heightmap-1.0",
+                  "version": "1.0.0",
+                  "scheme": "tms",
+                  "tiles": ["{z}/{x}/{y}.terrain"]
+                }""")
+
     def generate_scheme(self, is_compact):
         self.is_compact = is_compact
         has_child = False
@@ -120,6 +133,7 @@ class TileScheme(object):
             left_tx += self.bundle_size
 
     def make_bundles(self, out_loc, thread_count=multiprocessing.cpu_count()):
+        self.__write_config(out_loc)
         while len(self.bundles) > 0:
             bundle = self.bundles.pop(0)
             bundle.write_tiles(out_loc)
