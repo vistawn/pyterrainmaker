@@ -44,7 +44,8 @@ def print_usage():
     Usage: python terrainmaker.py [options] GDAL_DATASOURCE
     
     Options:
-    
+        -v, --version   output program version
+        
     
     ''')
 
@@ -58,8 +59,18 @@ def main(argv):
         print_usage()
         sys.exit(2)
 
+    for opt, arg in opts:
+        if opt == '-h':
+            print_usage()
+            sys.exit()
+        elif opt in ('-o', '--out_dir'):
+            out_loc = arg
+        elif opt in ('-v', '--verion'):
+            print('1.0.0')
+            sys.exit()
+
     if len(args) < 1:
-        print('Error: The gdal datasource must be specified.')
+        print('Error: The GDAL_DATASOURCE must be specified.')
         print('')
         print_usage()
         sys.exit(2)
@@ -70,13 +81,6 @@ def main(argv):
         print(in_tif, msg)
         print_usage()
         sys.exit()
-
-    for opt, arg in opts:
-        if opt == '-h':
-            print_usage()
-            sys.exit()
-        elif opt in ('-o', '--out_dir'):
-            out_loc = arg
 
     status, msg = check_loc(out_loc)
     if status is False:
