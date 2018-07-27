@@ -134,10 +134,15 @@ class TileScheme(object):
 
     def make_bundles(self, out_loc, thread_count=multiprocessing.cpu_count()):
         self.__write_config(out_loc)
+        sys.stdout.write("0")
+        sys.stdout.flush()
+        sum = len(self.bundles) + 0.0
         while len(self.bundles) > 0:
             bundle = self.bundles.pop(0)
             bundle.write_tiles(out_loc)
             del bundle
+            sys.stdout.write('...{0:.0f}'.format((1.0 - len(self.bundles)/sum)*100))
+            sys.stdout.flush()
 
 
 

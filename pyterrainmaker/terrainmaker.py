@@ -7,7 +7,7 @@ import getopt
 from TileScheme import TileScheme
 
 try:
-    from osgeo import gdal, osr
+    from osgeo import gdal
 except:
     print('gdal module is not found.')
     sys.exit(1)
@@ -92,12 +92,8 @@ def main(argv):
     ts.out_no_data = 0
     ts.generate_scheme(False)
     ts.make_bundles(out_loc)
+    print(" done")
 
 
 if __name__ == '__main__':
-    try:
-        from osgeo import gdal
-    except:
-        print('')
-
     main(sys.argv[1:])

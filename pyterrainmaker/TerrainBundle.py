@@ -152,7 +152,6 @@ class TerrainBundle(object):
             dst_bundle_ds.WriteRaster(0, 0, m_cols, m_rows, np.frombuffer(tile_array).tostring())
             self.bundle_array = np.array(dst_bundle_ds.GetRasterBand(1).ReadAsArray(0, 0, bundle_px_width, bundle_px_height))
         else:
-            print(m_cols, m_rows)
             prj_ds = mem_drv.Create('', m_cols, m_rows, 1, gdalconst.GDT_Float32)
             prj_band = prj_ds.GetRasterBand(1)
             prj_band.WriteArray(tile_array, 0, 0)
