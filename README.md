@@ -9,7 +9,7 @@ Fully compatible with [Cesium Terrain Server](https://github.com/geo-data/cesium
 
 ### `python terrainmaker.py -o ./terrain_tiles dem.tif`  
 
-```shell
+```
 Usage: python terrainmaker.py [options] GDAL_DATASOURCE
 Options:
     -v, --version           output program version
