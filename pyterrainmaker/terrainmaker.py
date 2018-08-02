@@ -44,9 +44,9 @@ def print_usage():
     Usage: python terrainmaker.py [options] GDAL_DATASOURCE
     
     Options:
-        -v, --version   output program version
-        
-    
+        -v, --version           output program version
+        -h, --help              output help information
+        -o, --out_dir <dir>     specifiy the output directory for terrains
     ''')
 
 
