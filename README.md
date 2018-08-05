@@ -5,7 +5,7 @@ like [Cesium Terrain Builder](https://github.com/geo-data/cesium-terrain-builder
 
 Fully compatible with [Cesium Terrain Server](https://github.com/geo-data/cesium-terrain-server) 
 
-##Command Line Tools
+## Command Line Tools
 
 ### `python terrainmaker.py -o ./terrain_tiles dem.tif`  
 
