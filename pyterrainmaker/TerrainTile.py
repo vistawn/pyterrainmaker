@@ -21,8 +21,20 @@ class TerrainTile(object):
     def encode(self, in_buddle_array, decodetype='heightmap'):
         self.source_array = in_buddle_array
         self.decode_type = decodetype
-
         self.array = self.source_array[self.y_offset:self.y_offset + 65, self.x_offset:self.x_offset + 65]
+
+        if self.fake:
+            if decodetype == 'heightmap':
+                return self.encode_fake_heightmap()
+            else:
+                return self.encode_fake_mesh()
+
+        if self.decode_type == 'heightmap':
+            return self.encode_heightmap()
+        else:
+            return self.encode_mesh()
+
+    def encode_heightmap(self):
         encode_array = (self.array + 1000) * 5
         encode_array_int = encode_array.astype(np.int16)
         encode_array_int = encode_array_int.flatten()
@@ -33,7 +45,7 @@ class TerrainTile(object):
 
         return encode_bytes
 
-    def encode_fake(self, decodetype='heightmap'):
+    def encode_fake_heightmap(self):
         self.array = np.zeros(4225).reshape(65, 65)
         encode_array = (self.array + 1000) * 5
         encode_array_int = encode_array.astype(np.int16)
@@ -43,11 +55,14 @@ class TerrainTile(object):
         encode_bytes += child_water_bytes
         return encode_bytes
 
+    def encode_mesh(self):
+        pass
+
+    def encode_fake_mesh(self):
+        pass
+
     def encode_and_save(self, in_buddle_array, location, decodetype='heightmap'):
-        if self.fake:
-            encoded_bytes = self.encode_fake()
-        else:
-            encoded_bytes = self.encode(in_buddle_array, decodetype)
+        encoded_bytes = self.encode(in_buddle_array, decodetype)
         if encoded_bytes is not None:
             # save
             terrain_x_loc = os.path.join(location, str(self.x))
