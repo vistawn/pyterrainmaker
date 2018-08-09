@@ -190,9 +190,6 @@ class TerrainBundle(object):
             return False
         return True
 
-    def make_tiles(self):
-        pass
-
     def write_tiles(self, location):
         self.calculate_tiles()
         terrain_level_loc = os.path.join(location, str(self.level))

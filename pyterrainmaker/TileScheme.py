@@ -10,6 +10,7 @@ import os
 import sys
 from osgeo import gdal
 import multiprocessing
+import json
 
 import GlobalGeodetic
 from TerrainBundle import TerrainBundle
@@ -91,6 +92,20 @@ class TileScheme(object):
             find_band_index += 1
         return self.__source_bands[find_band_index]
 
+    def __write_bundle_info(self, loc):
+        with open(os.path.join(loc, 'bundle.json'), 'w') as f:
+            info = {}
+            info['width'] = 128
+            info['height'] = 128
+            extent = {}
+            extent['x_min'] = self.__minx
+            extent['x_max'] = self.__maxx
+            extent['y_min'] = self.__miny
+            extent['y_max'] = self.__maxy
+            info['extent'] = extent
+            json.dump(info, f)
+
+
     def __write_config(self, loc):
         with open(os.path.join(loc, 'layer.json'), 'w') as f:
             f.write(
@@ -134,6 +149,8 @@ class TileScheme(object):
 
     def make_bundles(self, out_loc, thread_count=multiprocessing.cpu_count()):
         self.__write_config(out_loc)
+        if self.is_compact:
+            self.__write_bundle_info(out_loc)
         sys.stdout.write("0")
         sys.stdout.flush()
         sum = len(self.bundles) + 0.0

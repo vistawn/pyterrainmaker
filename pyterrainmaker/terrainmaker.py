@@ -46,19 +46,21 @@ def print_usage():
     Options:
         -v, --version           output program version
         -h, --help              output help information
-        -o, --out_dir <dir>     specifiy the output directory for terrains
+        -o, --out_dir <dir>     specify the output directory for terrains
+        -m, --mode <mode>       specify the output storage mode: compact/single, default is single
     ''')
 
 
 def main(argv):
 
-    out_loc = '.'
     try:
-        opts, args = getopt.getopt(argv, "hvo:", ['help=', 'version=', 'out_dir='])
+        opts, args = getopt.getopt(argv, "hvo:m:", ['help=', 'version=', 'out_dir=', 'mode='])
     except getopt.GetoptError:
         print_usage()
         sys.exit(2)
 
+    out_loc = '.'
+    storage_mode = 'single'
     for opt, arg in opts:
         if opt == '-h':
             print_usage()
@@ -68,6 +70,13 @@ def main(argv):
         elif opt in ('-v', '--verion'):
             print('1.0.0')
             sys.exit()
+        elif opt in ('-m', '--mode'):
+            if arg not in ['single','compact']:
+                print('-m parameter is invalid.')
+                print_usage()
+                sys.exit()
+            storage_mode = arg
+
 
     if len(args) < 1:
         print('Error: The GDAL_DATASOURCE must be specified.')
@@ -91,6 +100,8 @@ def main(argv):
     ts = TileScheme(in_tif)
     ts.out_no_data = 0
     ts.generate_scheme(False)
+    if storage_mode == 'compact':
+        ts.is_compact = True
     ts.make_bundles(out_loc)
     print(" done")
 
