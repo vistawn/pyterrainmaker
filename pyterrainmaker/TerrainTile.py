@@ -21,13 +21,14 @@ class TerrainTile(object):
     def encode(self, in_buddle_array, decodetype='heightmap'):
         self.source_array = in_buddle_array
         self.decode_type = decodetype
-        self.array = self.source_array[self.y_offset:self.y_offset + 65, self.x_offset:self.x_offset + 65]
-
+        
         if self.fake:
             if decodetype == 'heightmap':
                 return self.encode_fake_heightmap()
             else:
                 return self.encode_fake_mesh()
+
+        self.array = self.source_array[self.y_offset:self.y_offset + 65, self.x_offset:self.x_offset + 65]
 
         if self.decode_type == 'heightmap':
             return self.encode_heightmap()
