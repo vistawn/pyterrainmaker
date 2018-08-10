@@ -15,7 +15,7 @@ Options:
     -v, --version           output program version
     -h, --help              output help information
     -o, --out_dir <dir>     specify the output directory for terrains
-    -m, --mode <mode>      specify the output storage mode: compact/single, default is 							single
+    -m, --mode <mode>      specify the output storage mode: compact/single, default is single
 ```
 #### Recommendations
 
