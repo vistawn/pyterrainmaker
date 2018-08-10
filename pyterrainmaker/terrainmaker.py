@@ -97,11 +97,11 @@ def main(argv):
         print_usage()
         sys.exit()
 
-    ts = TileScheme(in_tif)
+    is_compact = True if storage_mode == 'compact' else False
+    ts = TileScheme(in_tif, is_compact)
     ts.out_no_data = 0
-    ts.generate_scheme(False)
-    if storage_mode == 'compact':
-        ts.is_compact = True
+    ts.generate_scheme()
+
     ts.make_bundles(out_loc)
     print(" done")
 

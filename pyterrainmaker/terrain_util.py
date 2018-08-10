@@ -47,10 +47,23 @@ def decode_as_txt(in_file, out_file):
 
 def decode_buffer(terrain_buffer):
     n = numpy.frombuffer(terrain_buffer, dtype=numpy.int16)
-    n1 = numpy.split(n,[4225])
+    n1 = numpy.split(n, [4225])
     des = n1[0].reshape(65,65)
     des = (des / 5) - 1000
     return des
 
-#decode_as_txt('tmp/out/18/425059/170336.terrain', 'tmp/a.asc')
-#decode_as_tif('tmp/out/18/425059/170336.terrain', 'tmp/', 425059, 170336, 18)
+
+def explode(bundle_file, out_loc):
+    with open(bundle_file, 'rb') as b_f:
+        header = b_f.read(12)
+        while header:
+            (tile_x, tile_y, tile_len) = struct.unpack('<3i', header)
+            print(tile_x, tile_y)
+            t_b = b_f.read(tile_len)
+            with open('{0}{1}_{2}.terrain'.format(out_loc, tile_x, tile_y), 'wb') as t_f:
+                t_f.write(t_b)
+            header = b_f.read(12)
+
+# decode_as_txt('tmp/out/18/425059/170336.terrain', 'tmp/a.asc')
+# decode_as_tif('tmp/split/425067_170369.terrain', 'tmp/', 425067, 170369, 18)
+# explode('tmp/425016_170394.bundle', 'tmp/split/')

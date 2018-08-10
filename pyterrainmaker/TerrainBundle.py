@@ -9,6 +9,7 @@ import os
 import numpy as np
 from osgeo import gdalconst
 from osgeo import gdal
+import struct
 
 from GlobalGeodetic import GlobalGeodetic
 from TerrainTile import TerrainTile
@@ -52,7 +53,6 @@ class TerrainBundle(object):
         self.from_tile = None
         self.source_range = None
         self.data_band = None
-        self.is_compact = False
         self.no_data = None
         self.out_no_data = None
         self.bundle_array = None
@@ -190,13 +190,26 @@ class TerrainBundle(object):
             return False
         return True
 
-    def write_tiles(self, location):
+    def write_tiles(self, location, decode_type):
         self.calculate_tiles()
         terrain_level_loc = os.path.join(location, str(self.level))
         if os.path.isdir(terrain_level_loc) is False:
             os.mkdir(terrain_level_loc)
 
-        while len(self.__tiles) > 0:
-            tile = self.__tiles.pop(0)
-            tile.encode_and_save(self.bundle_array, terrain_level_loc)
-            del tile
+        if self.is_compact is True:
+            bundle_name = '{0}_{1}.bundle'.format(self.from_tile[0], self.from_tile[1])
+            bundle_file_path = os.path.join(terrain_level_loc, bundle_name)
+            bundle_f = open(bundle_file_path, 'wb')
+            while len(self.__tiles) > 0:
+                tile = self.__tiles.pop(0)
+                tile.encode(self.bundle_array, decode_type)
+                header = struct.pack('<3i', tile.x, tile.y, len(tile.binary))
+                bundle_f.write(header)
+                bundle_f.write(tile.binary)
+                del tile
+            bundle_f.close()
+        else:
+            while len(self.__tiles) > 0:
+                tile = self.__tiles.pop(0)
+                tile.encode_and_save(self.bundle_array, terrain_level_loc)
+                del tile

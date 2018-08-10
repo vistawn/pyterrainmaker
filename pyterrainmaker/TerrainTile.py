@@ -1,7 +1,7 @@
 import numpy as np
 import struct
 import os
-import gzip
+import zlib
 
 
 class TerrainTile(object):
@@ -17,6 +17,7 @@ class TerrainTile(object):
         self.decode_type = 'heightmap'
         self.array = None
         self.fake = False
+        self.binary = None
 
     def encode(self, in_buddle_array, decodetype='heightmap'):
         self.source_array = in_buddle_array
@@ -24,16 +25,15 @@ class TerrainTile(object):
         
         if self.fake:
             if decodetype == 'heightmap':
-                return self.encode_fake_heightmap()
+                self.encode_fake_heightmap()
             else:
-                return self.encode_fake_mesh()
-
-        self.array = self.source_array[self.y_offset:self.y_offset + 65, self.x_offset:self.x_offset + 65]
-
-        if self.decode_type == 'heightmap':
-            return self.encode_heightmap()
+                self.encode_fake_mesh()
         else:
-            return self.encode_mesh()
+            self.array = self.source_array[self.y_offset:self.y_offset + 65, self.x_offset:self.x_offset + 65]
+            if self.decode_type == 'heightmap':
+                self.encode_heightmap()
+            else:
+                self.encode_mesh()
 
     def encode_heightmap(self):
         encode_array = (self.array + 1000) * 5
@@ -43,8 +43,12 @@ class TerrainTile(object):
         encode_bytes = encode_array_int.tobytes(order='C')
         child_water_bytes = struct.pack('<BB', self.child_flag, self.water_mask)
         encode_bytes += child_water_bytes
+        self.binary = self.compress_gz(encode_bytes)
 
-        return encode_bytes
+    def compress_gz(self, bytes):
+        gzip_compress = zlib.compressobj(9, zlib.DEFLATED, zlib.MAX_WBITS | 16)
+        gzip_data = gzip_compress.compress(bytes) + gzip_compress.flush()
+        return gzip_data
 
     def encode_fake_heightmap(self):
         self.array = np.zeros(4225).reshape(65, 65)
@@ -54,25 +58,25 @@ class TerrainTile(object):
         encode_bytes = encode_array_int.tobytes(order='C')
         child_water_bytes = struct.pack('<BB', self.child_flag, self.water_mask)
         encode_bytes += child_water_bytes
-        return encode_bytes
+        self.binary = self.compress_gz(encode_bytes)
 
     def encode_mesh(self):
-        pass
+        self.binary = None
 
     def encode_fake_mesh(self):
-        pass
+        self.binary = None
 
     def encode_and_save(self, in_buddle_array, location, decodetype='heightmap'):
-        encoded_bytes = self.encode(in_buddle_array, decodetype)
-        if encoded_bytes is not None:
+        self.encode(in_buddle_array, decodetype)
+        if self.binary is not None:
             # save
             terrain_x_loc = os.path.join(location, str(self.x))
             if os.path.isdir(terrain_x_loc) is False:
                 os.mkdir(terrain_x_loc)
             terrain_file_name = terrain_x_loc + '/' + str(self.y) + '.terrain'
-            with gzip.open(terrain_file_name, 'wb+') as f:
-                f.write(encoded_bytes)
+            with open(terrain_file_name, 'wb+') as f:
+                f.write(self.binary)
 
-        del encoded_bytes
+            self.binary = None
 
 

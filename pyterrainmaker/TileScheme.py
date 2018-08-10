@@ -21,7 +21,7 @@ if sys.version_info >= (3, 0):
 
 class TileScheme(object):
 
-    def __init__(self, input_tif):
+    def __init__(self, input_tif, is_storage_compact):
         """
         create tiling scheme
         :param input_tif: input GeoTiff file
@@ -38,7 +38,7 @@ class TileScheme(object):
         # bundle mode
         # explode: save each tile as single .terrain file
         # compact: save all tiles in one bundle as .bundle file
-        self.is_compact = False
+        self.is_compact = is_storage_compact
 
         self.__tile_source_bands = {}
         # data extent
@@ -105,7 +105,6 @@ class TileScheme(object):
             info['extent'] = extent
             json.dump(info, f)
 
-
     def __write_config(self, loc):
         with open(os.path.join(loc, 'layer.json'), 'w') as f:
             f.write(
@@ -117,8 +116,7 @@ class TileScheme(object):
                   "tiles": ["{z}/{x}/{y}.terrain"]
                 }""")
 
-    def generate_scheme(self, is_compact):
-        self.is_compact = is_compact
+    def generate_scheme(self):
         has_child = False
         for level in sorted(self.__levels.keys(), reverse=True):
             self.generate_bundles_by_level(level, has_child)
@@ -147,7 +145,7 @@ class TileScheme(object):
             top_ty = top_ty1
             left_tx += self.bundle_size
 
-    def make_bundles(self, out_loc, thread_count=multiprocessing.cpu_count()):
+    def make_bundles(self, out_loc, decode_type='heightmap', thread_count=multiprocessing.cpu_count()):
         self.__write_config(out_loc)
         if self.is_compact:
             self.__write_bundle_info(out_loc)
@@ -156,7 +154,7 @@ class TileScheme(object):
         sum = len(self.bundles) + 0.0
         while len(self.bundles) > 0:
             bundle = self.bundles.pop(0)
-            bundle.write_tiles(out_loc)
+            bundle.write_tiles(out_loc, decode_type)
             del bundle
             sys.stdout.write('...{0:.0f}'.format((1.0 - len(self.bundles)/sum)*100))
             sys.stdout.flush()
