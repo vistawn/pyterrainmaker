@@ -1,8 +1,12 @@
 
+
+from __future__ import print_function
 import os
 import gzip
 import numpy
 import struct
+import sys
+import getopt
 from osgeo import gdal, gdalconst
 from osgeo import osr
 
@@ -64,6 +68,65 @@ def explode(bundle_file, out_loc):
                 t_f.write(t_b)
             header = b_f.read(12)
 
+
+def print_usage():
+    print('''
+    Usage: python terrain_util.py [options] 
+
+    Options:
+        -v, --version      output program version
+        -h, --help         output help information
+        -c, --cmd <cmd>    command: dtif(decode as tif)/dtxt(decode as text)/explode(explode bundle to single terrains)
+        -i, --input        in_file: input terrain or bundle file
+        -d, --dir          dir for output exploded terrain files
+        -o, --output       output text or TIFF file
+    ''')
+
+
+def main(argv):
+    try:
+        opts, args = getopt.getopt(argv, "hvc:i:d:o:", ['help=', 'version=', 'cmd=', 'input=', 'dir=', 'output='])
+    except getopt.GetoptError:
+        print_usage()
+        sys.exit(2)
+
+    in_file = None
+    out_loc = ''
+    out_file = None
+    cmd = None
+    for opt, arg in opts:
+        if opt == '-h':
+            print_usage()
+            sys.exit()
+        elif opt in ('-c', '--command'):
+            cmd = arg
+            if cmd is None:
+                print_usage()
+                sys.exit(2)
+        elif opt in ('-v', '--verion'):
+            print('1.0.0')
+            sys.exit()
+        elif opt in ('-i', '--input'):
+            in_file = arg
+        elif opt in ('-d', '--dir'):
+            out_loc = arg
+        elif opt in ('-o', '--output'):
+            out_file = arg
+
+    if in_file is None:
+        print_usage()
+        sys.exit(2)
+    #
+    # if cmd == 'dtif':
+    #     # decode as tiff
+
+
+
+
+
+if __name__ == '__main__':
+    main(sys.argv[1:])
+
 # decode_as_txt('tmp/out/18/425059/170336.terrain', 'tmp/a.asc')
-# decode_as_tif('tmp/split/425067_170369.terrain', 'tmp/', 425067, 170369, 18)
-# explode('tmp/425016_170394.bundle', 'tmp/split/')
+decode_as_tif('tmp/split/425067_170369.terrain', 'tmp/', 425067, 170369, 18)
+# explode('tmp/out/18/425016_170394.bundle', 'tmp/split/')

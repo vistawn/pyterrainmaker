@@ -22,6 +22,14 @@ Options:
 * Input GDAL_DATASOURCE elevation data should have only one band or elevation band is the first band.
 * Input GDAL_DATASOURCE band must create overviews if band's X-Size or Y-Size greater than 2000 pixel.
 
+### terrain_util
+```shell
+    python terrain_util.py 
+```
+
+
+
+
 ## Dependency
 * GDAL
 * numpy
