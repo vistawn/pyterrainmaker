@@ -132,8 +132,8 @@ class TerrainBundle(object):
 
         tile_array = self.data_band.ReadAsArray(b_px_min_x, b_px_min_y, w_x, w_y)
 
-        fill_blank_value = self.no_data
-        if self.out_no_data is not None:
+        fill_blank_value = self.out_no_data
+        if self.out_no_data is not None and self.no_data is not None:
             fill_blank_value = self.out_no_data
             np.place(tile_array, tile_array == self.no_data, self.out_no_data)
 
