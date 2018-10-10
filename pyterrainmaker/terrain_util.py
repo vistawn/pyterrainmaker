@@ -119,7 +119,7 @@ The most commonly used commands are:
     def get_transfrom(self, tile_x, tile_y, level):
         gg = GlobalGeodetic(True, 64)
         (t_min_y, t_min_x, t_max_y, t_max_x) = gg.TileLatLonBounds(tile_x, tile_y, level)
-        res = (t_max_x - t_min_x) / 65
+        res = (t_max_x - t_min_x) / 64
         return (t_min_x, res, 0.0, t_max_y, 0.0, -res)
 
     def decode_buffer(self, terrain_buffer):
