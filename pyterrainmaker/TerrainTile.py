@@ -29,14 +29,7 @@ class TerrainTile(object):
             else:
                 self.encode_fake_mesh()
         else:
-            y_max = self.y_offset + 65
-            x_max = self.x_offset + 65
-            y_size, x_size = self.source_array.shape
-            if y_max > y_size - 1:
-                y_max = y_size - 1
-            if x_max > x_size - 1:
-                x_max = x_size - 1
-            self.array = self.source_array[self.y_offset:y_max + 65, self.x_offset:x_max]
+            self.array = self.source_array[self.y_offset:self.y_offset + 65, self.x_offset:self.x_offset + 65]
             if self.decode_type == 'heightmap':
                 self.encode_heightmap()
             else:
