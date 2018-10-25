@@ -149,15 +149,18 @@ class TileScheme(object):
         self.__write_config(out_loc)
         if self.is_compact:
             self.__write_bundle_info(out_loc)
-        sys.stdout.write("0")
-        sys.stdout.flush()
-        sum = len(self.bundles) + 0.0
+
+        print('Start generating tiles...\r')
+        sum = len(self.bundles)
         while len(self.bundles) > 0:
             bundle = self.bundles.pop(0)
             bundle.write_tiles(out_loc, decode_type)
             del bundle
-            sys.stdout.write('...{0:.0f}'.format((1.0 - len(self.bundles)/sum)*100))
             sys.stdout.flush()
+            print('  {0}/{1} ({2:.0f}%)'.format(sum - len(self.bundles), sum, (1.0 - len(self.bundles)/sum)*100), end='\r')
+
+        print('finish.')
+
 
 
 
