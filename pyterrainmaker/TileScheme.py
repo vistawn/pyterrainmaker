@@ -85,6 +85,7 @@ class TileScheme(object):
             next_res = next_res / 2
             next_level += 1
             self.__levels[next_level] = next_res
+        self.__max_level = next_level
 
     def __find_source_band(self, in_res):
         find_band_index = 0
@@ -107,14 +108,17 @@ class TileScheme(object):
 
     def __write_config(self, loc):
         with open(os.path.join(loc, 'layer.json'), 'w') as f:
-            f.write(
-                """{
-                  "tilejson": "2.1.0",
-                  "format": "heightmap-1.0",
-                  "version": "1.0.0",
-                  "scheme": "tms",
-                  "tiles": ["{z}/{x}/{y}.terrain"]
-                }""")
+            layer_json = {}
+            layer_json["tilejson"] = "2.1.0"
+            layer_json["format"] = "heightmap-1.0"
+            layer_json["version"] = "1.0.0"
+            layer_json["scheme"] = "tms"
+            layer_json["tiles"] = ["{z}/{x}/{y}.terrain"]
+            layer_json["bounds"] = [self.__minx, self.__miny, self.__maxx, self.__maxy]
+            layer_json["minzoom"] = 0
+            layer_json["maxzoom"] = self.__max_level
+
+            f.write(json.dumps(layer_json, indent=4))
 
     def generate_scheme(self):
         has_child = False
