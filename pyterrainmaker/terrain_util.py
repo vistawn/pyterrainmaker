@@ -33,14 +33,11 @@ The most commonly used commands are:
    ex     explode a bundle file to single terrain files
 ''')
         parser.add_argument('command', help='Subcommand to run')
-        # parse_args defaults to [1:] for args, but you need to
-        # exclude the rest of the args too, or validation will fail
         args = parser.parse_args(sys.argv[1:2])
         if not hasattr(self, args.command):
             print('Unrecognized command')
             parser.print_help()
             exit(1)
-        # use dispatch pattern to invoke method with same name
         getattr(self, args.command)()
 
     def dt(self):
@@ -120,7 +117,7 @@ The most commonly used commands are:
         gg = GlobalGeodetic(True, 64)
         (t_min_y, t_min_x, t_max_y, t_max_x) = gg.TileLatLonBounds(tile_x, tile_y, level)
         res = (t_max_x - t_min_x) / 64
-        return (t_min_x, res, 0.0, t_max_y, 0.0, -res)
+        return t_min_x, res, 0.0, t_max_y, 0.0, -res
 
     def decode_buffer(self, terrain_buffer):
         n = numpy.frombuffer(terrain_buffer, dtype=numpy.int16)
@@ -128,8 +125,6 @@ The most commonly used commands are:
         des = n1[0].reshape(65, 65)
         des = (des / 5) - 1000
         return des
-
-
 
 
 if __name__ == '__main__':
