@@ -47,6 +47,7 @@ def print_usage():
         -v, --version           output program version
         -h, --help              output help information
         -o, --out_dir <dir>     specify the output directory for terrains
+        -f, --format <format>   specify the terrain format: heightmap/mesh, default is heightmap
         -m, --mode <mode>       specify the output storage mode: compact/single, default is single
     ''')
 
@@ -54,13 +55,14 @@ def print_usage():
 def main(argv):
 
     try:
-        opts, args = getopt.getopt(argv, "hvo:m:", ['help=', 'version=', 'out_dir=', 'mode='])
+        opts, args = getopt.getopt(argv, "hvo:f:m:", ['help=', 'version=', 'out_dir=', 'format=', 'mode='])
     except getopt.GetoptError:
         print_usage()
         sys.exit(2)
 
     out_loc = '.'
     storage_mode = 'single'
+    terrain_format = 'heightmap'
     for opt, arg in opts:
         if opt == '-h':
             print_usage()
@@ -70,13 +72,18 @@ def main(argv):
         elif opt in ('-v', '--verion'):
             print('1.0.0')
             sys.exit()
+        elif opt in ('-f', '--format'):
+            if arg not in ['heightmap', 'mesh']:
+                print('-f parameter is invalid.')
+                print_usage()
+                sys.exit()
+            terrain_format = arg
         elif opt in ('-m', '--mode'):
             if arg not in ['single','compact']:
                 print('-m parameter is invalid.')
                 print_usage()
                 sys.exit()
             storage_mode = arg
-
 
     if len(args) < 1:
         print('Error: The GDAL_DATASOURCE must be specified.')
@@ -98,11 +105,12 @@ def main(argv):
         sys.exit()
 
     is_compact = True if storage_mode == 'compact' else False
+
     ts = TileScheme(in_tif, is_compact)
     ts.out_no_data = 0
     ts.generate_scheme()
 
-    ts.make_bundles(out_loc)
+    ts.make_bundles(out_loc, decode_type=terrain_format)
     print(" done")
 
 

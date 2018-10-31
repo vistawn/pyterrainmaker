@@ -95,29 +95,40 @@ class TileScheme(object):
 
     def __write_bundle_info(self, loc):
         with open(os.path.join(loc, 'bundle.json'), 'w') as f:
-            info = {}
-            info['width'] = 128
-            info['height'] = 128
-            extent = {}
-            extent['x_min'] = self.__minx
-            extent['x_max'] = self.__maxx
-            extent['y_min'] = self.__miny
-            extent['y_max'] = self.__maxy
-            info['extent'] = extent
+            extent = {
+                'x_min': self.__minx,
+                'x_max': self.__maxx,
+                'y_min': self.__miny,
+                'y_max': self.__maxy
+            }
+            info = {
+                'width': 128,
+                'height': 128,
+                'extent': extent
+            }
             json.dump(info, f)
 
-    def __write_config(self, loc):
-        with open(os.path.join(loc, 'layer.json'), 'w') as f:
-            layer_json = {}
-            layer_json["tilejson"] = "2.1.0"
+    def __write_config(self, loc, decode_type):
+        layer_json = {
+            "tilejson": "2.1.0",
+            "version": "1.0.0",
+            "scheme": "tms",
+            "tiles": ["{z}/{x}/{y}.terrain"],
+            "bounds": [self.__minx, self.__miny, self.__maxx, self.__maxy],
+            "minzoom": 0,
+            "maxzoom": self.__max_level
+        }
+        if decode_type == 'heightmap':
             layer_json["format"] = "heightmap-1.0"
-            layer_json["version"] = "1.0.0"
-            layer_json["scheme"] = "tms"
-            layer_json["tiles"] = ["{z}/{x}/{y}.terrain"]
-            layer_json["bounds"] = [self.__minx, self.__miny, self.__maxx, self.__maxy]
-            layer_json["minzoom"] = 0
-            layer_json["maxzoom"] = self.__max_level
+        else:
+            layer_json["format"] = "quantized-mesh-1.0"
+            layer_json["extensions"] = ["watermask", "octvertexnormals"]
 
+        self.write_layer_json(loc, layer_json)
+
+    @staticmethod
+    def write_layer_json(loc, layer_json):
+        with open(os.path.join(loc, 'layer.json'), 'w') as f:
             f.write(json.dumps(layer_json, indent=4))
 
     def generate_scheme(self):
@@ -150,7 +161,7 @@ class TileScheme(object):
             left_tx += self.bundle_size
 
     def make_bundles(self, out_loc, decode_type='heightmap', thread_count=multiprocessing.cpu_count()):
-        self.__write_config(out_loc)
+        self.__write_config(out_loc, decode_type)
         if self.is_compact:
             self.__write_bundle_info(out_loc)
 

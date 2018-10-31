@@ -82,7 +82,7 @@ class TerrainBundle(object):
                         flag = self.calc_tile_flag(tile_range)
                     else:
                         flag = 0x00
-                    tile = TerrainTile(offset_x=index_x * 64, offset_y=index_y*64, flag_child=flag)
+                    tile = TerrainTile(index_x * 64, index_y*64, flag, tile_range)
                     tile.x = tile_x
                     tile.y = tile_y
 
@@ -211,5 +211,5 @@ class TerrainBundle(object):
         else:
             while len(self.__tiles) > 0:
                 tile = self.__tiles.pop(0)
-                tile.encode_and_save(self.bundle_array, terrain_level_loc)
+                tile.encode_and_save(self.bundle_array, terrain_level_loc, decode_type)
                 del tile
