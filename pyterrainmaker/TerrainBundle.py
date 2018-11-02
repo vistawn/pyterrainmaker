@@ -82,7 +82,7 @@ class TerrainBundle(object):
                         flag = self.calc_tile_flag(tile_range)
                     else:
                         flag = 0x00
-                    tile = TerrainTile(index_x * 64, index_y*64, flag, tile_range)
+                    tile = TerrainTile(index_x * 64, index_y*64, flag, tile_range, self.resolution)
                     tile.x = tile_x
                     tile.y = tile_y
 

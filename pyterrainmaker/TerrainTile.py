@@ -8,7 +8,7 @@ import Mesh
 
 class TerrainTile(object):
 
-    def __init__(self, offset_x, offset_y, flag_child, tile_bounds):
+    def __init__(self, offset_x, offset_y, flag_child, tile_bounds, tile_resolution):
         self.child_flag = flag_child
         self.x_offset = offset_x
         self.y_offset = offset_y
@@ -21,6 +21,7 @@ class TerrainTile(object):
         self.fake = False
         self.binary = None
         self.bounds = tile_bounds
+        self.resolution = tile_resolution
 
     def encode(self, in_buddle_array, decodetype='heightmap'):
         self.source_array = in_buddle_array
@@ -64,13 +65,21 @@ class TerrainTile(object):
         encode_bytes += child_water_bytes
         self.binary = self.compress_gz(encode_bytes)
 
-    def encode_mesh(self):
-        Mesh.encode_mesh_terrain(self.array, self.bounds)
+    @staticmethod
+    def make_triangle(x1, y1, h1, x2, y2, h2, x3, y3, h3):
+        trangle_geom = 'POLYGON Z (({0} {1} {2}, {3} {4} {5}, {6} {7} {8}, {0} {1} {2}))'.format(
+            x1, y1, h1, x2, y2, h2, x3, y3, h3
+        )
+        return trangle_geom
 
-        self.binary = None
+    def encode_mesh(self):
+        tile_mesh_bytes = Mesh.encode_terrain_mesh(self.array, self.bounds)
+        self.binary = self.compress_gz(tile_mesh_bytes)
 
     def encode_fake_mesh(self):
-        self.binary = None
+        self.array = np.zeros(4).reshape(2, 2)
+        tile_mesh_bytes = Mesh.encode_terrain_mesh(self.array, self.bounds)
+        self.binary = self.compress_gz(tile_mesh_bytes)
 
     def encode_and_save(self, in_buddle_array, location, decodetype='heightmap'):
         self.encode(in_buddle_array, decodetype)
