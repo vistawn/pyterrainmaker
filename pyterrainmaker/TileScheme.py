@@ -8,6 +8,7 @@
 from __future__ import print_function
 import os
 import sys
+import shutil
 from osgeo import gdal
 import multiprocessing
 import json
@@ -53,6 +54,8 @@ class TileScheme(object):
 
         # TMS levels
         self.__levels = {}
+
+        self.__avaliables = {}
 
         self.__get_tif_info()
         self.__compute_levels()
@@ -108,6 +111,15 @@ class TileScheme(object):
             }
             json.dump(info, f)
 
+    def __gen_avaliables(self):
+        avaliables = []
+        for x in xrange(0, self.__max_level + 1):
+            if x == 0:
+                avaliables.append([{"startX": 0, "endX": 1, "startY": 0, "endY": 0}])
+            else:
+                avaliables.append(self.__avaliables[x])
+        return avaliables
+
     def __write_config(self, loc, decode_type):
         layer_json = {
             "tilejson": "2.1.0",
@@ -115,6 +127,7 @@ class TileScheme(object):
             "scheme": "tms",
             "tiles": ["{z}/{x}/{y}.terrain"],
             "bounds": [self.__minx, self.__miny, self.__maxx, self.__maxy],
+            "available": self.__gen_avaliables(),
             "minzoom": 0,
             "maxzoom": self.__max_level
         }
@@ -142,6 +155,7 @@ class TileScheme(object):
         gg = GlobalGeodetic.GlobalGeodetic(True, 64)
         left_tx, top_ty = gg.LonLatToTile(self.__minx, self.__maxy, level)
         right_tx, bottom_ty = gg.LonLatToTile(self.__maxx, self.__miny, level)
+        self.__avaliables[level] = [{"startX": left_tx, "endX": right_tx, "startY": bottom_ty, "endY": top_ty}]
         source_band = self.__find_source_band(res)
         top_ty1 = top_ty
         while left_tx <= right_tx:
@@ -160,22 +174,44 @@ class TileScheme(object):
             top_ty = top_ty1
             left_tx += self.bundle_size
 
+    @staticmethod
+    def fill_zero_level(out_loc, decode_type):
+        base_path = os.path.join(out_loc, '0')
+        first_path = os.path.join(base_path, '0')
+        second_path = os.path.join(base_path, '1')
+        first_t = os.path.join(base_path, '0', '0.terrain')
+        second_t = os.path.join(base_path, '1', '0.terrain')
+
+        temp_0 = 'mesh000.terrain'
+        temp_1 = 'mesh010.terrain'
+        if decode_type == 'heightmap':
+            temp_0 = 'blank_heightmap.terrain'
+            temp_1 = 'blank_heightmap.terrain'
+        if not os.path.exists(first_t):
+            if not os.path.exists(first_path):
+                os.mkdir(first_path)
+            shutil.copyfile(temp_0, first_t)
+        if not os.path.exists(second_t):
+            if not os.path.exists(second_path):
+                os.mkdir(second_path)
+            shutil.copyfile(temp_1, second_t)
+
     def make_bundles(self, out_loc, decode_type='heightmap', thread_count=multiprocessing.cpu_count()):
         self.__write_config(out_loc, decode_type)
         if self.is_compact:
             self.__write_bundle_info(out_loc)
 
-        print('Start generating tiles...\r')
-        sum = len(self.bundles)
+        print('Start generating tiles...')
+        total = len(self.bundles)
         while len(self.bundles) > 0:
             bundle = self.bundles.pop(0)
             bundle.write_tiles(out_loc, decode_type)
             del bundle
             sys.stdout.flush()
-            print('  {0}/{1} ({2:.0f}%)'.format(sum - len(self.bundles), sum, (1.0 - len(self.bundles)/sum)*100), end='\r')
+            remains = len(self.bundles) + 0.0
+            print('  {0:.0f}/{1} ({2:.0f}%)'.format(total - remains, total, (1.0 - remains/total)*100), end='\r')
 
-        print('finish.')
-
+        self.fill_zero_level(out_loc, decode_type)
 
 
 

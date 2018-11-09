@@ -111,7 +111,7 @@ def main(argv):
     ts.generate_scheme()
 
     ts.make_bundles(out_loc, decode_type=terrain_format)
-    print(" done")
+    print("\r\n   done")
 
 
 if __name__ == '__main__':

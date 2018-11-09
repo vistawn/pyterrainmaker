@@ -74,12 +74,12 @@ class TerrainTile(object):
 
     def encode_mesh(self):
         tile_mesh_bytes = Mesh.encode_terrain_mesh(self.array, self.bounds)
-        self.binary = self.compress_gz(tile_mesh_bytes)
+        self.binary = tile_mesh_bytes
 
     def encode_fake_mesh(self):
-        self.array = np.zeros(4).reshape(2, 2)
+        self.array = np.zeros(64).reshape(8, 8)
         tile_mesh_bytes = Mesh.encode_terrain_mesh(self.array, self.bounds)
-        self.binary = self.compress_gz(tile_mesh_bytes)
+        self.binary = tile_mesh_bytes
 
     def encode_and_save(self, in_buddle_array, location, decodetype='heightmap'):
         self.encode(in_buddle_array, decodetype)
