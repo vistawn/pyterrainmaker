@@ -182,11 +182,13 @@ class TileScheme(object):
         first_t = os.path.join(base_path, '0', '0.terrain')
         second_t = os.path.join(base_path, '1', '0.terrain')
 
-        temp_0 = 'mesh000.terrain'
-        temp_1 = 'mesh010.terrain'
+        module_dir = os.path.abspath(os.path.join(__file__, '..'))
+
+        temp_0 = os.path.join(module_dir, 'data', 'mesh000.terrain')
+        temp_1 = os.path.join(module_dir, 'data', 'mesh010.terrain')
         if decode_type == 'heightmap':
-            temp_0 = 'blank_heightmap.terrain'
-            temp_1 = 'blank_heightmap.terrain'
+            temp_0 = os.path.join(module_dir, 'data', 'blank_heightmap.terrain')
+            temp_1 = os.path.join(module_dir, 'data', 'blank_heightmap.terrain')
         if not os.path.exists(first_t):
             if not os.path.exists(first_path):
                 os.mkdir(first_path)
