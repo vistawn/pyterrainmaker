@@ -46,6 +46,7 @@ def print_usage():
     Options:
         -v, --version           output program version
         -h, --help              output help information
+        -l, --fill <raster>     fill nodata by another raster
         -o, --out_dir <dir>     specify the output directory for terrains
         -f, --format <format>   specify the terrain format: heightmap/mesh, default is heightmap
         -m, --mode <mode>       specify the output storage mode: compact/single, default is single
@@ -55,7 +56,7 @@ def print_usage():
 def main(argv):
 
     try:
-        opts, args = getopt.getopt(argv, "hvo:f:m:", ['help=', 'version=', 'out_dir=', 'format=', 'mode='])
+        opts, args = getopt.getopt(argv, "hvl:o:f:m:", ['help=', 'version=', 'fill=', 'out_dir=', 'format=', 'mode='])
     except getopt.GetoptError:
         print_usage()
         sys.exit(2)
@@ -63,6 +64,7 @@ def main(argv):
     out_loc = '.'
     storage_mode = 'single'
     terrain_format = 'heightmap'
+    fill_raster = None
     for opt, arg in opts:
         if opt == '-h':
             print_usage()
@@ -72,6 +74,14 @@ def main(argv):
         elif opt in ('-v', '--verion'):
             print('1.0.0')
             sys.exit()
+        elif opt in ('-l', '--fill'):
+            status, msg = check_tif(arg)
+            if status is False:
+                print(arg, msg)
+                print_usage()
+                sys.exit()
+            else:
+                fill_raster = arg
         elif opt in ('-f', '--format'):
             if arg not in ['heightmap', 'mesh']:
                 print('-f parameter is invalid.')
@@ -108,6 +118,8 @@ def main(argv):
 
     ts = TileScheme(in_tif, is_compact)
     ts.out_no_data = 0
+    if fill_raster:
+        ts.set_fill_raster(fill_raster)
     ts.generate_scheme()
 
     ts.make_bundles(out_loc, decode_type=terrain_format)

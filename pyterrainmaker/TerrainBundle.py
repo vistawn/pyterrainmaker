@@ -56,6 +56,7 @@ class TerrainBundle(object):
         self.no_data = None
         self.out_no_data = None
         self.bundle_array = None
+        self.fill_raster = None
 
     def calculate_tiles(self):
         cols = self.data_band.XSize
@@ -141,6 +142,16 @@ class TerrainBundle(object):
 
         if shift_obj is not ((0, 0), (0, 0)):
             tile_array = np.lib.pad(tile_array, shift_obj, 'constant', constant_values=[fill_blank_value])
+
+        if self.fill_raster and self.level >= 6:
+            zero_rows, zero_cols = np.where(tile_array == 0)
+            for i in xrange(len(zero_cols)):
+                cell_row = zero_rows[i]
+                cell_col = zero_cols[i]
+                lon = band_res * cell_col + b_min_x
+                lat = b_max_y - band_res * cell_row
+                fill_value = self.fill_raster.get_height(lon, lat)
+                tile_array[cell_row][cell_col] = fill_value
 
         (m_rows, m_cols) = tile_array.shape
 

@@ -15,6 +15,7 @@ import json
 
 import GlobalGeodetic
 from TerrainBundle import TerrainBundle
+from FillRaster import FillRaster
 
 if sys.version_info >= (3, 0):
     xrange = range
@@ -59,6 +60,7 @@ class TileScheme(object):
 
         self.__get_tif_info()
         self.__compute_levels()
+        self.fill_raster = None
 
     def __get_tif_info(self):
         cols = self.__ds.RasterXSize
@@ -139,6 +141,9 @@ class TileScheme(object):
 
         self.write_layer_json(loc, layer_json)
 
+    def set_fill_raster(self, raster_loc):
+        self.fill_raster = FillRaster(raster_loc)
+
     @staticmethod
     def write_layer_json(loc, layer_json):
         with open(os.path.join(loc, 'layer.json'), 'w') as f:
@@ -167,6 +172,7 @@ class TileScheme(object):
                 g_bundle.no_data = self.source_no_data
                 g_bundle.out_no_data = self.out_no_data
                 g_bundle.has_next_level = has_child
+                g_bundle.fill_raster = self.fill_raster
                 g_bundle.data_band = source_band
                 g_bundle.source_range = (self.__minx, self.__miny, self.__maxx, self.__maxy)
                 self.bundles.append(g_bundle)
