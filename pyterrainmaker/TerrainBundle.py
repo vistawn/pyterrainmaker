@@ -179,7 +179,8 @@ class TerrainBundle(object):
         del prj_ds
         del dst_bundle_ds
 
-    def calc_tile_flag(self, (t_min_y, t_min_x, t_max_y, t_max_x)):
+    def calc_tile_flag(self, bound):
+        (t_min_y, t_min_x, t_max_y, t_max_x) = bound
         N = S = W = E = False
         mid_x = (t_min_x + t_max_x) / 2
         mid_y = (t_min_y + t_max_y) / 2

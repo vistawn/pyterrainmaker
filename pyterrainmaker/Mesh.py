@@ -8,8 +8,8 @@ def encode_terrain_mesh(terrain_grid, bounds):
     res = (t_max_x - t_min_x) / (width-1)
 
     geometries = []
-    for col in xrange(0, width - 1):
-        for row in xrange(0, width - 1):
+    for col in range(0, width - 1):
+        for row in range(0, width - 1):
             v1_x = t_min_x + col * res
             v1_y = t_max_y - (row * res)
             h1 = terrain_grid[row][col]
