@@ -3,8 +3,6 @@ import struct
 import os
 import zlib
 
-import Mesh
-
 
 class TerrainTile(object):
 

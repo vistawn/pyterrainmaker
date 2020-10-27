@@ -140,7 +140,7 @@ class TerrainBundle(object):
 
         shift_obj = (shift_obj_v, shift_obj_h) = ((shift_top, shift_bottom), (shift_left, shift_right))
 
-        if shift_obj is not ((0, 0), (0, 0)):
+        if shift_obj != ((0, 0), (0, 0)):
             tile_array = np.lib.pad(tile_array, shift_obj, 'constant', constant_values=[fill_blank_value])
 
         if self.fill_raster and self.level >= 6:
@@ -160,7 +160,7 @@ class TerrainBundle(object):
         dst_bundle_ds = mem_drv.Create('', bundle_px_width, bundle_px_height, 1, gdalconst.GDT_Float32)
 
         if m_cols == bundle_px_width and m_rows == bundle_px_height:
-            dst_bundle_ds.WriteRaster(0, 0, m_cols, m_rows, np.frombuffer(tile_array).tostring())
+            dst_bundle_ds.WriteRaster(0, 0, m_cols, m_rows, np.frombuffer(tile_array, tile_array.dtype).tostring())
             self.bundle_array = np.array(dst_bundle_ds.GetRasterBand(1).ReadAsArray(0, 0, bundle_px_width, bundle_px_height))
         else:
             prj_ds = mem_drv.Create('', m_cols, m_rows, 1, gdalconst.GDT_Float32)
@@ -174,9 +174,10 @@ class TerrainBundle(object):
                 self.error("ReprojectImage() failed on %s, error %d" % ('aa', res))
             else:
                 self.bundle_array = np.array(dst_bundle_ds.GetRasterBand(1).ReadAsArray(0, 0, bundle_px_width, bundle_px_height))
+            
+            del prj_ds
 
         del tile_array
-        del prj_ds
         del dst_bundle_ds
 
     def calc_tile_flag(self, bound):

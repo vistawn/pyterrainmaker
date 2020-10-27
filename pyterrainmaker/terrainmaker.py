@@ -21,7 +21,7 @@ def check_tif(in_tif):
     if in_ds.RasterXSize > 2000 or in_ds.RasterYSize > 2000:
         band = in_ds.GetRasterBand(1)
         ov_count = band.GetOverviewCount()
-        if ov_count is 0:
+        if ov_count == 0:
             del band, in_ds
             return False, ' do not have any overview. '
     del in_ds
