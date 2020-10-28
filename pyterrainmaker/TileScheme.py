@@ -204,7 +204,7 @@ class TileScheme(object):
                 os.mkdir(second_path)
             shutil.copyfile(temp_1, second_t)
 
-    def make_bundles(self, out_loc, decode_type='heightmap', thread_count=multiprocessing.cpu_count()):
+    def make_bundles(self, out_loc, decode_type='heightmap', mesh_max_error=0.01, thread_count=multiprocessing.cpu_count()):
         self.__write_config(out_loc, decode_type)
         if self.is_compact:
             self.__write_bundle_info(out_loc)
@@ -213,7 +213,7 @@ class TileScheme(object):
         total = len(self.bundles)
         while len(self.bundles) > 0:
             bundle = self.bundles.pop(0)
-            bundle.write_tiles(out_loc, decode_type)
+            bundle.write_tiles(out_loc, decode_type, mesh_max_error)
             del bundle
             sys.stdout.flush()
             remains = len(self.bundles) + 0.0

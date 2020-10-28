@@ -47,16 +47,17 @@ def print_usage():
         -v, --version           output program version
         -h, --help              output help information
         -l, --fill <raster>     fill nodata by another raster
-        -o, --out_dir <dir>     specify the output directory for terrains
-        -f, --format <format>   specify the terrain format: heightmap/mesh, default is heightmap
-        -m, --mode <mode>       specify the output storage mode: compact/single, default is single
+        -o, --out_dir <dir>     output directory for terrains
+        -f, --format <format>   terrain format: heightmap/mesh, default is heightmap
+        -e, --max_error <float> maximum triangulation error (float [=0.001])
+        -m, --mode <mode>       output storage mode: compact/single, default is single
     ''')
 
 
 def main(argv):
 
     try:
-        opts, args = getopt.getopt(argv, "hvl:o:f:m:", ['help=', 'version=', 'fill=', 'out_dir=', 'format=', 'mode='])
+        opts, args = getopt.getopt(argv, "hvl:o:f:e:m:", ['help=', 'version=', 'fill=', 'out_dir=', 'format=', 'max_error=','mode='])
     except getopt.GetoptError:
         print_usage()
         sys.exit(2)
@@ -65,12 +66,15 @@ def main(argv):
     storage_mode = 'single'
     terrain_format = 'heightmap'
     fill_raster = None
+    max_error = 0.01
     for opt, arg in opts:
         if opt == '-h':
             print_usage()
             sys.exit()
         elif opt in ('-o', '--out_dir'):
             out_loc = arg
+        elif opt in ('-e', '--max_error'):
+            max_error = arg
         elif opt in ('-v', '--verion'):
             print('1.0.0')
             sys.exit()
@@ -100,6 +104,12 @@ def main(argv):
         print('')
         print_usage()
         sys.exit(2)
+    
+    try:
+        max_error = float(max_error)
+    except expression as identifier:
+        print('max_error must be float type. [0 - 1]')
+        sys.exit()
 
     in_tif = args[0]
     status, msg = check_tif(in_tif)
@@ -122,7 +132,7 @@ def main(argv):
         ts.set_fill_raster(fill_raster)
     ts.generate_scheme()
 
-    ts.make_bundles(out_loc, decode_type=terrain_format)
+    ts.make_bundles(out_loc, decode_type=terrain_format, mesh_max_error=max_error)
     print("\r\n   done")
 
 

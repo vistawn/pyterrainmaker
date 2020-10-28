@@ -83,7 +83,7 @@ class TerrainBundle(object):
                         flag = self.calc_tile_flag(tile_range)
                     else:
                         flag = 0x00
-                    tile = TerrainTile(index_x * 64, index_y*64, flag, tile_range, self.resolution)
+                    tile = TerrainTile(index_x * 64, index_y*64, flag, (t_min_x, t_min_y, t_max_x, t_max_y), self.resolution)
                     tile.x = tile_x
                     tile.y = tile_y
 
@@ -203,7 +203,7 @@ class TerrainBundle(object):
             return False
         return True
 
-    def write_tiles(self, location, decode_type):
+    def write_tiles(self, location, decode_type, mesh_max_error):
         self.calculate_tiles()
         terrain_level_loc = os.path.join(location, str(self.level))
         if os.path.isdir(terrain_level_loc) is False:
@@ -215,7 +215,7 @@ class TerrainBundle(object):
             bundle_f = open(bundle_file_path, 'wb')
             while len(self.__tiles) > 0:
                 tile = self.__tiles.pop(0)
-                tile.encode(self.bundle_array, decode_type)
+                tile.encode(self.bundle_array, decode_type, mesh_max_error)
                 header = struct.pack('<3i', tile.x, tile.y, len(tile.binary))
                 bundle_f.write(header)
                 bundle_f.write(tile.binary)
@@ -224,5 +224,5 @@ class TerrainBundle(object):
         else:
             while len(self.__tiles) > 0:
                 tile = self.__tiles.pop(0)
-                tile.encode_and_save(self.bundle_array, terrain_level_loc, decode_type)
+                tile.encode_and_save(self.bundle_array, terrain_level_loc, decode_type, mesh_max_error)
                 del tile
