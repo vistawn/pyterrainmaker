@@ -7,10 +7,10 @@ Fully compatible with [Cesium Terrain Server](https://github.com/geo-data/cesium
 
 ## Command Line Tools
 
-### `python terrainmaker.py -o ./terrain_tiles dem.tif`  
+### `python3 terrainmaker.py -o ./terrain_tiles dem.tif`  
 
 ```
-Usage: python terrainmaker.py [options] GDAL_DATASOURCE
+Usage: python3 terrainmaker.py [options] GDAL_DATASOURCE
 Options:
     -v, --version           output program version
     -h, --help              output help information
@@ -24,7 +24,7 @@ Options:
 
 ### terrain_util
 ```shell
-    python terrain_util.py 
+    python3 terrain_util.py 
 ```
 
 
@@ -33,17 +33,13 @@ Options:
 ## Dependency
 * GDAL
 * numpy
+* quantized_mesh_encoder
+* pydelatin
 
-## Advantages compared to Cesium Terrain Builder
-
-* Implements with Pure Python. easy to install & use.
-* Lower IO usage and faster especially process big data.
-* NO MORE GDAL error thrown when processing big data.
 
 ## TODO
 
 * Bundle mode terrains for better storage and management.
-* Support for [quantized-mesh-1.0 terrain format](https://cesiumjs.org/data-and-assets/terrain/formats/quantized-mesh-1.0/)
 * Multi-threading support
 
 
