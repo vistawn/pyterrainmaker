@@ -1,9 +1,9 @@
 # pyterrainmaker
 
-A pure Python library for making  [heightmap-1.0 terrain format](http://cesiumjs.org/data-and-assets/terrain/formats/heightmap-1.0.html) terrains for use with [CesiumJs](http://cesiumjs.org)
-like [Cesium Terrain Builder](https://github.com/geo-data/cesium-terrain-builder).
+A pure Python library for making [heightmap](https://github.com/CesiumGS/cesium/wiki/heightmap-1.0) and [quantized-mesh](https://github.com/CesiumGS/quantized-mesh) terrains for [CesiumJs](http://cesiumjs.org).
 
-Fully compatible with [Cesium Terrain Server](https://github.com/geo-data/cesium-terrain-server) 
+Fully compatible with [Cesium Terrain Server](https://github.com/geo-data/cesium-terrain-server).
+
 
 ## Command Line Tools
 
@@ -13,9 +13,12 @@ Fully compatible with [Cesium Terrain Server](https://github.com/geo-data/cesium
 Usage: python3 terrainmaker.py [options] GDAL_DATASOURCE
 Options:
     -v, --version           output program version
-    -h, --help              output help information
-    -o, --out_dir <dir>     specify the output directory for terrains
-    -m, --mode <mode>      specify the output storage mode: compact/single, default is single
+        -h, --help              output help information
+        -l, --fill <raster>     fill nodata by another raster
+        -o, --out_dir <dir>     output directory for terrains
+        -f, --format <format>   terrain format: heightmap/mesh, default is heightmap
+        -e, --max_error <float> maximum triangulation error (float [=0.001])
+        -m, --mode <mode>       output storage mode: compact/single, default is single
 ```
 #### Recommendations
 
