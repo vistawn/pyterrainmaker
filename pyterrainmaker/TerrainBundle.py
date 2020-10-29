@@ -11,8 +11,8 @@ from osgeo import gdalconst
 from osgeo import gdal
 import struct
 
-from GlobalGeodetic import GlobalGeodetic
-from TerrainTile import TerrainTile
+from .GlobalGeodetic import GlobalGeodetic
+from .TerrainTile import TerrainTile
 
 import sys
 if sys.version_info >= (3, 0):

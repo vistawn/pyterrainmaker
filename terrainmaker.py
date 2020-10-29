@@ -1,10 +1,9 @@
 
-from __future__ import print_function
 import sys
 import os
 import getopt
 
-from TileScheme import TileScheme
+from pyterrainmaker.TileScheme import TileScheme
 
 try:
     from osgeo import gdal
@@ -107,7 +106,7 @@ def main(argv):
     
     try:
         max_error = float(max_error)
-    except expression as identifier:
+    except Exception as identifier:
         print('max_error must be float type. [0 - 1]')
         sys.exit()
 

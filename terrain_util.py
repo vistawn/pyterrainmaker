@@ -10,7 +10,7 @@ from osgeo import gdal
 from osgeo import gdalconst
 from osgeo import osr
 
-from GlobalGeodetic import GlobalGeodetic
+from  pyterrainmaker.GlobalGeodetic import GlobalGeodetic
 
 
 try:

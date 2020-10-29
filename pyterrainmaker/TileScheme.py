@@ -5,7 +5,6 @@
 # Generate tiling scheme
 #
 
-from __future__ import print_function
 import os
 import sys
 import shutil
@@ -13,12 +12,9 @@ from osgeo import gdal
 import multiprocessing
 import json
 
-import GlobalGeodetic
-from TerrainBundle import TerrainBundle
-from FillRaster import FillRaster
-
-if sys.version_info >= (3, 0):
-    xrange = range
+from .GlobalGeodetic import GlobalGeodetic
+from .TerrainBundle import TerrainBundle
+from .FillRaster import FillRaster
 
 
 class TileScheme(object):
@@ -77,7 +73,7 @@ class TileScheme(object):
         self.__source_bands[0] = band
         self.source_no_data = band.GetNoDataValue()
         band_count = band.GetOverviewCount()
-        for x in xrange(0, band_count):
+        for x in range(0, band_count):
             band_ov = band.GetOverview(x)
             self.__source_bands[x + 1] = band_ov
             self.__resolutions[x + 1] = ori_resolution * cols / band_ov.XSize
@@ -115,7 +111,7 @@ class TileScheme(object):
 
     def __gen_avaliables(self):
         avaliables = []
-        for x in xrange(0, self.__max_level + 1):
+        for x in range(0, self.__max_level + 1):
             if x == 0:
                 avaliables.append([{"startX": 0, "endX": 1, "startY": 0, "endY": 0}])
             else:
@@ -157,7 +153,7 @@ class TileScheme(object):
 
     def generate_bundles_by_level(self, level, has_child):
         res = self.__levels[level]
-        gg = GlobalGeodetic.GlobalGeodetic(True, 64)
+        gg = GlobalGeodetic(True, 64)
         left_tx, top_ty = gg.LonLatToTile(self.__minx, self.__maxy, level)
         right_tx, bottom_ty = gg.LonLatToTile(self.__maxx, self.__miny, level)
         self.__avaliables[level] = [{"startX": left_tx, "endX": right_tx, "startY": bottom_ty, "endY": top_ty}]
