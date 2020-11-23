@@ -87,12 +87,12 @@ class TerrainBundle(object):
                     tile.x = tile_x
                     tile.y = tile_y
 
-                    if self.level < 6:
+                    if self.level < 4:
                         tile.fake = True
 
                     self.__tiles.append(tile)
 
-        if self.level < 6:
+        if self.level < 4:
             return
 
         bundle_tiles_x = tile_max_x - self.from_tile[0] + 1
@@ -115,18 +115,23 @@ class TerrainBundle(object):
         b_px_min_y = int((data_max_y - b_max_y) / band_res)
         b_px_max_y = int((data_max_y - b_min_y) / band_res) + 1
 
+        b_real_min_x, b_real_max_x, b_real_min_y, b_real_max_y = b_min_x, b_max_x, b_min_y, b_max_y
         shift_left = shift_right = shift_top = shift_bottom = 0
         if b_px_min_x < 0:
             shift_left = abs(b_px_min_x)
+            b_real_min_x += shift_left * band_res
             b_px_min_x = 0
         if b_px_max_x >= cols:
             shift_right = b_px_max_x - cols
+            b_real_max_x -= shift_right * band_res
             b_px_max_x = cols
         if b_px_min_y < 0:
             shift_top = abs(b_px_min_y)
+            b_real_min_y += shift_top * band_res
             b_px_min_y = 0
         if b_px_max_y >= rows:
             shift_bottom = b_px_max_y - rows
+            b_real_max_y -= shift_bottom * band_res
             b_px_max_y = rows
         w_x = b_px_max_x - b_px_min_x
         w_y = b_px_max_y - b_px_min_y
@@ -143,15 +148,12 @@ class TerrainBundle(object):
         if shift_obj != ((0, 0), (0, 0)):
             tile_array = np.lib.pad(tile_array, shift_obj, 'constant', constant_values=[fill_blank_value])
 
-        if self.fill_raster and self.level >= 6:
-            zero_rows, zero_cols = np.where(tile_array == 0)
-            for i in xrange(len(zero_cols)):
-                cell_row = zero_rows[i]
-                cell_col = zero_cols[i]
-                lon = band_res * cell_col + b_min_x
-                lat = b_max_y - band_res * cell_row
-                fill_value = self.fill_raster.get_height(lon, lat)
-                tile_array[cell_row][cell_col] = fill_value
+        if self.fill_raster:
+            h,w = tile_array.shape
+            fill_array = self.fill_raster.get_array((b_real_min_x, b_real_min_y, b_real_max_x, b_real_max_y), w, h)
+            if fill_array is not None:
+                tile_array = np.where(tile_array==0, fill_array, tile_array)
+
 
         (m_rows, m_cols) = tile_array.shape
 

@@ -30,8 +30,8 @@ class TileScheme(object):
         if self.__ds is None:
             raise Exception('Open input TIFF file failed')
 
-        # one bundle has 128*128 tiles
-        self.bundle_size = 128
+        # one bundle has 32*32 tiles
+        self.bundle_size = 32
 
         # bundle mode
         # explode: save each tile as single .terrain file
