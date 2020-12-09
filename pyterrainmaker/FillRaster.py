@@ -105,12 +105,4 @@ class FillRaster(object):
                 del prj_ds
                 del dst_ds
                 return result
-        
-        
-        
-
-
-
-        clip_array = clip_band.ReadAsArray()
-        return clip_array
 
